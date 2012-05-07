@@ -1,5 +1,5 @@
 ..
-      Copyright 2011 OpenStack, LLC
+      Copyright 2011-2012 OpenStack, LLC
       All Rights Reserved.
 
       Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -18,12 +18,13 @@
 Setting up a Keystone development environment
 =============================================
 
-This document describes setting up keystone directly from GitHub_
+This document describes getting the source from keystone's `GitHub repository`_
 for development purposes.
 
-To install keystone from packaging, refer instead to Keystone's `User Documentation`_.
+To install keystone from packaging, refer instead to Keystone's `User
+Documentation`_.
 
-.. _GitHub: http://github.com/openstack/keystone
+.. _`GitHub Repository`: http://github.com/openstack/keystone
 .. _`User Documentation`: http://docs.openstack.org/
 
 Prerequisites
@@ -31,7 +32,7 @@ Prerequisites
 
 This document assumes you are using:
 
-- Ubuntu 11.10, Fedora 15, openSUSE 11.4, 12.1 or Mac OS X Lion
+- Ubuntu 11.10, Fedora 15, or Mac OS X Lion
 - `Python 2.7`_
 
 .. _`Python 2.7`: http://www.python.org/
@@ -51,7 +52,7 @@ different version of the above, please document your configuration here!
 Getting the latest code
 =======================
 
-You can clone our latest code from our `Github repository`::
+Make a clone of the code from our `Github repository`::
 
     $ git clone https://github.com/openstack/keystone.git
 
@@ -59,13 +60,17 @@ When that is complete, you can::
 
     $ cd keystone
 
-.. _`Github repository`: https://github.com/openstack/keystone
-
 Installing dependencies
 =======================
 
-Keystone maintains a list of PyPi_ dependencies, designed for use by
-pip_.
+Keystone maintains two lists of dependencies::
+
+    tools/pip-requires
+    tools/test-requires
+
+The first is the list of dependencies needed for running keystone, the second list includes dependencies used for active development and testing of keystone itself.
+
+These depdendencies can be installed from PyPi_ using the python tool pip_.
 
 .. _PyPi: http://pypi.python.org/
 .. _pip: http://pypi.python.org/pypi/pip
@@ -83,53 +88,68 @@ Fedora 15::
 
     $ sudo yum install python-sqlite2 python-lxml python-greenlet-devel python-ldap
 
-openSUSE 11.4, 12.1::
-
-    $ sudo zypper in python-devel python-xml gcc libxslt-devel python-ldap openldap2-devel
-
 Mac OS X Lion (requires MacPorts_)::
 
     $ sudo port install py-ldap
 
 .. _MacPorts: http://www.macports.org/
 
-PyPi Packages
--------------
+PyPi Packages and VirtualEnv
+----------------------------
 
-Assuming you have any necessary binary packages & header files available
-on your system, you can then install PyPi dependencies.
+We recommend establishing a virtualenv to run keystone within. Virtualenv
+limits the python environment to just what you're installing as depdendencies,
+useful to keep a clean environment for working on Keystone. The tools directory
+in keystone has a script already created to make this very simple::
 
-You may also need to prefix `pip install` with `sudo`, depending on your
-environment::
+    $ python tools/install_venv.py
 
-    # Describe dependencies (including non-PyPi dependencies)
-    $ cat tools/pip-requires
+This will create a local virtual environment in the directory ``.venv``.
+Once created, you can activate this virtualenv for your current shell using::
 
-    # Install all PyPi dependencies (for production, testing, and development)
+    $ source .venv/bin/activate
+
+The virtual environment can be disabled using the command::
+
+    $ deactivate
+
+You can also use ``tools\with_venv.sh`` to prefix commands so that they run
+within the virtual environment. For more information on virtual environments,
+see virtualenv_.
+
+.. _virtualenv: http://www.virtualenv.org/
+
+If you want to run keystone outside of a virtualenv, you can install the
+dependencies directly into your system from the requires files::
+
+    # Install the dependencies for running keystone
     $ pip install -r tools/pip-requires
 
-Updating your PYTHONPATH
-========================
+    # Install the dependencies for developing, testing, and running keystone
+    $ pip install -r tools/test-requires
 
-There are a number of methods for getting Keystone into your PYTHON PATH,
-the easiest of which is::
-
-    # Fake-install the project by symlinking Keystone into your Python site-packages
+    # Use python setup.py to link Keystone into python's site-packages
     $ python setup.py develop
+
+
+Verifying Keystone is set up
+============================
+
+Once set up, either directly or within a virtualenv, you should be able to
+invoke python and import the libraries. If you're using a virtualenv, don't
+forget to activate it::
+
+    $ source .venv/bin/activate
+    $ python
 
 You should then be able to `import keystone` from your Python shell
 without issue::
 
-    >>> import keystone.version
+    >>> import keystone
     >>>
 
-If you want to check the version of Keystone you are running:
-
-    >>> print keystone.version.version()
-    2012.1-dev
-
-
-If you can import keystone successfully, you should be ready to move on to :doc:`testing`.
+If you can import keystone successfully, you should be ready to move on to
+:doc:`developing`
 
 Troubleshooting
 ===============
